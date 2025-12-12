@@ -22,13 +22,14 @@ provider "aws" {
   region = "us-east-2"
 }
 
+
 #
 # resource - EC2 인스턴스 생성
 #
 
 # 1) SG 생성
 resource "aws_security_group" "allow_8080" {
-  name        = "allow_8080"
+  name        = var.security_group_name
   description = "Allow TLS inbound traffic and all outbound traffic"
 
   tags = {
@@ -39,9 +40,9 @@ resource "aws_security_group" "allow_8080" {
 resource "aws_vpc_security_group_ingress_rule" "allow_8080_http" {
   security_group_id = aws_security_group.allow_8080.id
   cidr_ipv4         = "0.0.0.0/0"
-  from_port         = 8080
+  from_port         = var.server_port
   ip_protocol       = "tcp"
-  to_port           = 8080
+  to_port           = var.server_port
 }
 
 resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4" {
@@ -68,4 +69,18 @@ resource "aws_instance" "myinstance" {
     Name = "MyFirstInstance"
   }
 }
+
+
+# # [입력 변수]
+# variable "security_group_name" {
+#   description = "Security group name for My EC2" 
+#   type = string
+#   default = "allow_8080"
+# }
+
+# # [출력 변수]
+# output "public_ip" {
+#   description = "My EC2 Public IP"
+#   value = aws_instance.myinstance.public_ip
+# }
 
